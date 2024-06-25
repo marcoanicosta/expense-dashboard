@@ -18,6 +18,9 @@ function App() {
       {orbMemo}
       <MainLayout>
         <Navigation active={active} setActive={setActive} />
+        <main>
+          
+        </main>
       </MainLayout>
     </AppStyled>
   );
