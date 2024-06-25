@@ -21,6 +21,8 @@ module.exports = {
       { allowConstantExport: true },
     ],
     'react/prop-types': 'off', // Optional: turn off prop-types if using React with hooks and no prop-types validation
+    'react/react-in-jsx-scope': 'off', // Turn off the rule requiring React to be in scope
+    'no-unused-vars': 'warn', // Set no-unused-vars to warn instead of error
   },
   settings: {
     react: {
