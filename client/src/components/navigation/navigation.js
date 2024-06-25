@@ -22,6 +22,7 @@ function Navigation({active, setActive}) {
                     <li 
                         key={item.id}
                         onClick={() => setActive(item.id)}
+                        className={active === item.id ? 'active' : ''}
                     >
                         {item.icon}
                         <span>{item.title}</span>
@@ -93,7 +94,23 @@ const NavStyled = styled.nav`
                     transition: all .4s ease-in-out;
                 }
             }
-        }   
+        }
+        .active{
+        color: rgba(34, 34, 96, 1) !important;
+        i{
+            color: rgba(34, 34, 96, 1) !important;
+        }
+        &::before{
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #222260;
+            border-radius: 0 10px 10px 0;
+        }
+    }  
 `;
 
 export default Navigation
