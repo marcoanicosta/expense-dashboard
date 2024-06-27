@@ -24,12 +24,44 @@ export const GlobalProvider = ({ children }) => {
         } catch (err) {
             setError(err.response ? err.response.data.message : err.message);
         }
+        getIncome()
     };
+
+    const getIncome = async () => {
+        const response = await axios.get(`${BASE_URL}get-income`)
+        setIncome(response.data)
+        console.log(`TESTING2 🚨🅿️`)
+        console.log(response.data)
+    }
+
+   const deleteIncome = async (id) => {
+        try {
+            const response = await axios.delete((`${BASE_URL}delete-income/${id}`))
+            console.log(response.data)
+        } catch (err) {
+            setError(err.response ? err.response.data.message : err.message);
+        }
+        getIncome()
+    }
+
+    const totalIncome = () => {
+        let totalIncome = 0;
+        incomes.forEach(income => {
+            totalIncome += income.amount
+        })
+        return totalIncome
+    }
+
+   console.log( 'total 🏦:', totalIncome())
 
     return (
         <GlobalContext.Provider value={
             {
                 addIncome,
+                getIncome,
+                incomes,
+                deleteIncome,
+                totalIncome,
             }
         }>
             {children}

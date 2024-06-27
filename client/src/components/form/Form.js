@@ -6,7 +6,7 @@ import Button from '../button/Button'
 import { plus } from '../../utils/Icons';
 
 function Form() {
-    const {addIncome} = useGlobalContext()
+    const {addIncome, getIncome} = useGlobalContext()
     const [inputState, setInputState] = useState({ 
         title: '',
         amount: '',
@@ -27,6 +27,14 @@ function Form() {
     const handleSubmit = e => {
         e.preventDefault()
         addIncome(inputState)
+        getIncome()
+        setInputState({
+            title: '',
+            amount: '',
+            date: '',
+            category: '',
+            description: '',
+        })
     }
 
     return (
@@ -64,7 +72,7 @@ function Form() {
                     <option value=""  disabled >Select Option</option>
                     <option value="salary">Salary</option>
                     <option value="freelancing">Freelancing</option>
-                    <option value="investments">Investiments</option>
+                    <option value="investments">Investments</option>
                     <option value="stocks">Stocks</option>
                     <option value="bitcoin">Bitcoin</option>
                     <option value="bank">Bank Transfer</option>  

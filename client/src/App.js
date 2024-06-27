@@ -15,7 +15,7 @@ function App() {
   const global = useGlobalContext();
   console.log(global)
 
-  console.log(`${active}: This is active ✅`)
+  //console.log(`${active}: This is active ✅`)
   const displayData = () => { 
     switch(active) {
       case 1:
