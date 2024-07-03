@@ -2,6 +2,7 @@ import React, {useState, useContext} from 'react';
 import axios from 'axios';
 
 
+
 const BASE_URL = 'http://localhost:5001/api/v1/';
 
 const GlobalContext = React.createContext();
@@ -11,6 +12,7 @@ export const GlobalProvider = ({ children }) => {
 
     const [incomes, setIncome] = useState([])
     const [expenses, setExpenses] = useState([])
+    const [accounts, setAccounts] = useState([])
     const [error, setError] = useState(null)
 
     // Income functions 🛰️
@@ -83,6 +85,35 @@ export const GlobalProvider = ({ children }) => {
     }
 
 
+    // Account functions 🛰️
+    const addAccount = async (account) => {
+        const response = await axios.post(`${BASE_URL}add-account`, account)
+            .catch((err) =>{
+                setError(err.response.data.message)
+            })
+        getAccounts()
+    }
+
+    const getAccounts = async () => {
+        const response = await axios.get(`${BASE_URL}get-account`)
+        setAccounts(response.data)
+        console.log(response.data)
+    }
+
+    const deleteAccount = async (id) => {
+        const res  = await axios.delete(`${BASE_URL}delete-account/${id}`)
+        getAccounts()
+    }
+
+    // const totalAccounts = () => {
+    //     let totalIncome = 0;
+    //     expenses.forEach((account) =>{
+    //         totalIncome = totalIncome + income.amount
+    //     })
+
+    //     return totalIncome;
+    // }
+
     const totalBalance = () => {
         return totalIncome() - totalExpenses()
     }
@@ -114,6 +145,10 @@ export const GlobalProvider = ({ children }) => {
                 getExpenses,
                 setError,
                 transactionHistory,
+                addAccount,
+                getAccounts,
+                deleteAccount,
+                accounts,
             }
         }>
             {children}
