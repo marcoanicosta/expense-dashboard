@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import DatePicker from 'react-datepicker'
 import { useGlobalContext } from '../../contexts/globalContexts'
@@ -6,23 +6,59 @@ import Button from '../button/Button'
 import { plus } from '../../utils/Icons';
 
 function Form() {
-    const {addIncome, getIncome} = useGlobalContext()
+    const {addIncome, getIncome, accounts} = useGlobalContext()
     const [inputState, setInputState] = useState({ 
         title: '',
         amount: '',
         date: '',
         category: '',
         description: '',
+        accountId: '' // TODO Add accountId to the state
     })
 
-    const {title, amount, date, category, description} = inputState;
+    //const [accounts, setAccounts] = useState([]); // State to store accounts
+    const {title, amount, date, category, description, accountId} = inputState;
+
+// TODO: Review the useEffect hook
+/*
+    useEffect(() => {
+        // Fetch accounts from the backend
+        const fetchAccounts = async () => {
+            try {
+                const response = await fetch('/api/accounts'); //TODO: review endpoint
+                const data = await response.json();
+                setAccounts(data);
+            } catch (error) {
+                console.error('Error fetching accounts:', error);
+            }
+        };
+
+        fetchAccounts();
+    }, []);
+
+    */
+    // useEffect(() => {
+    //     getAccounts(); // Fetch accounts when component mounts
+    //     console.log("testing 🚨🚨🚨 ")
+    // }, []); 
+
+
+    useEffect(() => {
+        console.log('Accounts in Form 🛜🅿️:', accounts); // Log accounts data in Form
+    }, [accounts]);
 
     const handleInput = name => e => {
-        setInputState({
+        const value = e.target.value;
+        setInputState(prevState => ({
+            ...prevState,
+            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+        }));
+        console.log('Updated Input State:', {
             ...inputState,
-            [name]: e.target.value
-        })
-    }
+            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+        });
+    };
+
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -34,6 +70,7 @@ function Form() {
             date: '',
             category: '',
             description: '',
+            accountId: '',
         })
     }
 
@@ -50,7 +87,7 @@ function Form() {
             </div>
             <div className="input-control">
                 <input value={amount}  
-                    type="text" 
+                    type="number" 
                     name={'amount'} 
                     placeholder={'Salary Amount'}
                     onChange={handleInput('amount')} 
@@ -82,6 +119,15 @@ function Form() {
             </div>
             <div className="input-control">
                 <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
+            </div>
+            <div className="selects input-control">
+                <select required value={accountId} name="accountId" id="accountId" onChange={handleInput('accountId')}>
+                    <option value="" disabled>Select Account</option>
+                    {accounts.map(account => (
+                        <option key={account._id} value={account._id}>{account.account_name}</option>
+                        
+                    ))}
+                </select>
             </div>
             <div className="submit-btn">
                 <Button 
@@ -133,6 +179,7 @@ const FormStyled = styled.form`
             }
         }
     }
+    
 
     .submit-btn{
         button{

@@ -1,28 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import { useGlobalContext } from '../../contexts/globalContexts'
 import Button from '../button/Button'
-import { plus } from '../../utils/Icons';
+import { accounts, plus } from '../../utils/Icons';
 
 
 function ExpenseForm() {
-    const {addExpense, error, setError} = useGlobalContext()
+    const {addExpense, error, setError, accounts} = useGlobalContext()
     const [inputState, setInputState] = useState({
         title: '',
         amount: '',
         date: '',
         category: '',
         description: '',
+        accountId:  '',
     })
 
-    const { title, amount, date, category,description } = inputState;
+    const { title, amount, date, category, description, accountId } = inputState;
+
+    useEffect(() => {
+        console.log('Accounts in Form 🛜🅿️:', accounts); // Log accounts data in Form
+    }, [accounts]);
 
     const handleInput = name => e => {
-        setInputState({...inputState, [name]: e.target.value})
-        setError('')
-    }
+        const value = e.target.value;
+        setInputState(prevState => ({
+            ...prevState,
+            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+        }));
+        console.log('Updated Input State:', {
+            ...inputState,
+            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+        });
+    };
 
     const handleSubmit = e => {
         e.preventDefault()
@@ -33,6 +45,7 @@ function ExpenseForm() {
             date: '',
             category: '',
             description: '',
+            accountId: '',
         })
     }
 
@@ -82,6 +95,15 @@ function ExpenseForm() {
             </div>
             <div className="input-control">
                 <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
+            </div>
+            <div className="selects input-control">
+                <select required value={accountId} name="accountId" id="accountId" onChange={handleInput('accountId')}>
+                    <option value="" disabled>Select Account</option>
+                    {accounts.map(account => (
+                        <option key={account._id} value={account._id}>{account.account_name}</option>
+                        
+                    ))}
+                </select>
             </div>
             <div className="submit-btn">
                 <Button 

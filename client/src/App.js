@@ -25,11 +25,11 @@ function App() {
       case 2:
         return <Transaction />
       case 3:
-        return <Income />
+        return <Accounts />
       case 4:
-        return <Expenses />
+        return <Income />
       case 5:
-          return <Accounts />
+          return <Expenses />
       default:
         return <Dashboard />
     }
