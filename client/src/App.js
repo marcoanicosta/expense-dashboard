@@ -5,8 +5,10 @@ import Orb from "./components/orb/Orb";
 import Navigation from './components/navigation/Navigation';
 import React, {useMemo, useState } from 'react';
 import Dashboard from './components/dashboard/Dashboard';
+import Transaction from './components/transaction/Transaction';
 import Income from './components/income/Income';
 import Expenses from './components/expenses/Expenses';
+import Accounts from './components/accounts/accounts';
 import { useGlobalContext } from './contexts/globalContexts';
 
 function App() {
@@ -21,11 +23,13 @@ function App() {
       case 1:
         return <Dashboard />
       case 2:
-        return <Dashboard />
+        return <Transaction />
       case 3:
-        return <Income />
+        return <Accounts />
       case 4:
-        return <Expenses />
+        return <Income />
+      case 5:
+          return <Expenses />
       default:
         return <Dashboard />
     }

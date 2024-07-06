@@ -6,13 +6,20 @@ import Form from '../form/Form';
 import IncomeItem from '../incomeItem/IncomeItem'
 
 function Income() {
-  const {addIncome, incomes, getIncome, deleteIncome, totalIncome} = useGlobalContext()
+  const {addIncome, incomes, getIncome, deleteIncome, totalIncome, getAccounts, accounts} = useGlobalContext()
 
     useEffect(() =>{
       getIncome()
-      console.log('Testing 🚨🅿️ 1 ')
+      getAccounts() // Fetch accounts when component mounts
+      console.log('Testing 🚨🅿️ 1 - Fetching accounts');
     }, [])
 
+    useEffect(() => {
+      console.log('Accounts 🛜:', accounts); // Log accounts data
+    }, [accounts]);
+
+
+  
   return (
     <IncomeStyled>
       <InnerLayout>
