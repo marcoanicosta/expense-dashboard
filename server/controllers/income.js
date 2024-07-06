@@ -4,7 +4,7 @@ const Income = require('../models/incomeModel'); // Adjust the path as necessary
 
 // TODO: v1
 exports.addIncome = async (req, res) => {
-    const { title, amount, type, date, category, description, accountId } = req.body;
+    const { title, amount, type, date, category, description, accountId, recurrence } = req.body;
 
     const income = new Income({
         title,
@@ -13,7 +13,12 @@ exports.addIncome = async (req, res) => {
         date,
         category,
         description,
-        account: accountId
+        account: accountId,
+        recurrence: recurrence ? {
+            frequency: recurrence.frequency,
+            startDate: recurrence.startDate,
+            endDate: recurrence.endDate || null
+        } : undefined
     }); // create a new instance of the Income model
 
     try {
