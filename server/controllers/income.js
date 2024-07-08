@@ -1,5 +1,6 @@
-const Accounts = require('../models/accountsModel'); // Adjust the path as necessary
-const Income = require('../models/incomeModel'); // Adjust the path as necessary
+const Accounts = require('../models/accountsModel'); 
+const CreditAccount = require('../models/creditAccountModel'); 
+const Income = require('../models/incomeModel'); 
 
 const getNextOccurrence = (frequency, lastDate) => {
     const nextDate = new Date(lastDate);
@@ -55,9 +56,9 @@ exports.addIncome = async (req, res) => {
         const savedIncome = await income.save(); // save the data to the database
 
         // Find the account and update it with the new income
-        const account = await Accounts.findById(accountId);
-        if (!account) {
-            return res.status(404).json({ message: 'Account not found' });
+        let account = await Accounts.findById(accountId);
+        if (account.type === 'credit') {
+            account = await CreditAccount.findById(accountId);
         }
         
         await account.updateBalanceAfterAddingIncome(savedIncome._id);
@@ -145,79 +146,3 @@ exports.getUpcomingRecurringTransactions = async (req, res) => {
     }
 };
 
-
-
-
-
-    //TODO: v2
-// exports.addIncome = async (req, res) => {
-//     const { title, amount, type, date, category, description, accountId } = req.body;
-
-//     const income = new Income({
-//         title,
-//         amount,
-//         type,
-//         date,
-//         category,
-//         description,
-//         account: accountId
-//     });
-
-//     try {
-//         // Validations
-//         if (!title || !date || !category || !description || !accountId) {
-//             return res.status(400).json({ message: 'All fields are required' });
-//         }
-//         if (amount <= 0 || typeof amount !== 'number') {
-//             return res.status(400).json({ message: 'Amount must be a positive number' });
-//         }
-
-//         // Save the new income
-//         const savedIncome = await income.save();
-
-//         // Find the account and update it with the new income
-//         const account = await Account.findById(accountId);
-//         if (!account) {
-//             return res.status(404).json({ message: 'Account not found' });
-//         }
-
-//         // Update the account balance
-//         await account.updateBalanceAfterAddingIncome(savedIncome._id);
-
-//         res.status(200).json({ message: 'Income added successfully', income: savedIncome });
-//     } catch (error) {
-//         console.error('Server Error:', error); // Log the error for debugging
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
-
-
-///OLD 
-
-// exports.deleteIncome = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         console.log(id, "MY ID 🚨");
-        
-//         const income = await Income.findByIdAndDelete(id);
-//         console.log(id)
-
-//         const account = await Account.findOne({ incomes: id });
-//         if (account) {
-//             await account.updateBalanceAfterRemovingIncome(id);
-//         }
-
-//         res.status(200).json({ message: 'Income deleted' });
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-//     // const {id} = req.params; // get the id from the request parameters
-//     // console.log(id)
-//     // Income.findByIdAndDelete(id)
-//     //     .then((income) => {
-//     //         res.status(200).json({ message: 'Income deleted successfully' });
-//     //     }) // find the data by id and delete it
-//     //     .catch ((error) => {
-//     //         res.status(500).json({ message: 'Server Error', error });
-//     //     });
-// }

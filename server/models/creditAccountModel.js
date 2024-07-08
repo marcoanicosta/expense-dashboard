@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Account = require('./accountModel'); // Adjust the path as necessary
+const Account = require('./accountsModel'); // Adjust the path as necessary
 
 const CreditAccountSchema = new mongoose.Schema({
     creditLimit: {

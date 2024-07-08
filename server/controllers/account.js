@@ -1,24 +1,46 @@
 const Account = require("../models/accountsModel");
+const CreditAccount = require('../models/creditAccountModel');
 
 
 
 exports.addAccount = async (req, res) => {
-        const { account_name, balance, type, } = req.body;
+        const { account_name, balance, type, creditLimit, apr, description } = req.body;
 
-        const account = new Account({
-            account_name, 
-            balance,
-            type
-        });
+
+        let account;
+
+        if (type === 'credit') {
+            account = new CreditAccount({
+                account_name,
+                balance,
+                type,
+                creditLimit,
+                apr,
+                description
+            });
+        } else {
+            account = new Account({
+                account_name,
+                balance,
+                type,
+                //description
+            });
+        }
+
+
 
         try {
             // validations
             if (!account_name || !type) {
-                return res.status(400).json({ message: 'All fields are required' });
+                return res.status(400).json({ message: 'Account name and type are required' });
             }
-            if (balance <= 0 || !balance === "number") {
-                return res.status(400).json({ message: 'Balance must be a positive number' });
+            if (balance === undefined || typeof balance !== "number") {
+                return res.status(400).json({ message: 'Balance must be a valid number' });
             }
+            if (type === 'credit' && (balance > 0 || balance < -creditLimit)) {
+                return res.status(400).json({ message: 'Credit account balance must be zero or negative and within the credit limit' });
+            }
+
             await account.save(); // save the data to the database
             res.status(200).json({ message: 'Account added successfully' });
         } catch (error) {
