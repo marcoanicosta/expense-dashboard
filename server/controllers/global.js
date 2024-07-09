@@ -1,5 +1,5 @@
 // globalController.js
-const { getUpcomingRecurringTransactions } = require('../utils/recurrenceUtils');
+const { getUpcomingRecurringTransactions, getNextOccurrence } = require('../utils/utils');
 
 exports.getUpcomingTransactions = async (req, res) => {
     try {

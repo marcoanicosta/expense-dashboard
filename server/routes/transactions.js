@@ -1,5 +1,7 @@
-const { addIncome, getIncome, deleteIncome, getUpcomingRecurringTransactions } = require ('../controllers/income');
+const { addIncome, getIncome, deleteIncome } = require ('../controllers/income');
 const { addExpense, getExpense, deleteExpense } = require ('../controllers/expense');
+const { getUpcomingTransactions } = require ('../controllers/global');
+const { getUpcomingRecurringTransactions } = require ('../controllers/transactions');
 
 const router = require('express').Router();
 
@@ -10,8 +12,8 @@ router.post('/add-income', addIncome)
     .post('/add-expense', addExpense)
     .get('/get-expense', getExpense)
     .delete('/delete-expense/:id', deleteExpense)
-    .get('/upcoming-recurring-transactions', getUpcomingRecurringTransactions);
-
+    .get('/upcoming-recurring-transactions', getUpcomingRecurringTransactions)
+    .get('/upcoming-transactions', getUpcomingTransactions);
 
 
 

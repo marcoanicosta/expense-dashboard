@@ -1,29 +1,7 @@
 const Accounts = require('../models/accountsModel'); 
 const CreditAccount = require('../models/creditAccountModel'); 
 const Income = require('../models/incomeModel'); 
-
-const getNextOccurrence = (frequency, lastDate) => {
-    const nextDate = new Date(lastDate);
-
-    switch (frequency) {
-        case 'daily':
-            nextDate.setDate(nextDate.getDate() + 1);
-            break;
-        case 'weekly':
-            nextDate.setDate(nextDate.getDate() + 7);
-            break;
-        case 'monthly':
-            nextDate.setMonth(nextDate.getMonth() + 1);
-            break;
-        case 'yearly':
-            nextDate.setFullYear(nextDate.getFullYear() + 1);
-            break;
-        default:
-            throw new Error('Invalid frequency');
-    }
-
-    return nextDate;
-};
+const { getNextOccurrence } = require('../utils/utils');
 
 // TODO: v1
 exports.addIncome = async (req, res) => {
@@ -114,12 +92,12 @@ exports.deleteIncome = async (req, res) => {
     }
 };
 
-exports.getUpcomingRecurringTransactions = async (req, res) => {
+exports.getUpcomingIncomes = async (req, res) => {
     try {
         const now = new Date();
-        const upcomingTransactions = [];
+        const upcomingIncomes = [];
 
-        const incomes = await Income.find({ 
+        const incomes = await Income.find({
             'recurrence.frequency': { $exists: true },
             'recurrence.startDate': { $lte: now },
             $or: [
@@ -133,16 +111,15 @@ exports.getUpcomingRecurringTransactions = async (req, res) => {
             while (nextOccurrence <= now) {
                 nextOccurrence = getNextOccurrence(income.recurrence.frequency, nextOccurrence);
             }
-            upcomingTransactions.push({
+            upcomingIncomes.push({
                 ...income._doc,
                 nextOccurrence
             });
         }
 
-        res.status(200).json(upcomingTransactions);
+        res.status(200).json(upcomingIncomes);
     } catch (error) {
-        console.error('Error retrieving upcoming recurring transactions:', error);
-        res.status(500).json({ message: 'Server Errors' });
+        console.error('Error retrieving upcoming recurring incomes:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };
-

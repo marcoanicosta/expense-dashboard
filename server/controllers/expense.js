@@ -1,28 +1,6 @@
 const Expense = require("../models/ExpenseModel");
 const Accounts = require("../models/accountsModel");
-
-const getNextOccurrence = (frequency, lastDate) => {
-    const nextDate = new Date(lastDate);
-
-    switch (frequency) {
-        case 'daily':
-            nextDate.setDate(nextDate.getDate() + 1);
-            break;
-        case 'weekly':
-            nextDate.setDate(nextDate.getDate() + 7);
-            break;
-        case 'monthly':
-            nextDate.setMonth(nextDate.getMonth() + 1);
-            break;
-        case 'yearly':
-            nextDate.setFullYear(nextDate.getFullYear() + 1);
-            break;
-        default:
-            throw new Error('Invalid frequency');
-    }
-
-    return nextDate;
-};
+const { getNextOccurrence } = require('../utils/utils');
 
 exports.addExpense = async (req, res) => {
     const { title, amount, type, date, category, description, accountId, recurrence } = req.body;
@@ -78,15 +56,19 @@ exports.deleteExpense = async (req, res) => {
     const { id } = req.params; // Get the id from the request parameters
     console.log(id);
     try {
-        const deletedExpense = await Expense.findByIdAndDelete(id);
-        if (!deletedExpense) {
+        const expense = await Expense.findById(id);
+        if (!expense) {
             return res.status(404).json({ message: 'Expense not found' });
         }
 
-        const account = await Accounts.findById(deletedExpense.account);
+        const account = await Accounts.findById(expense.account);
         if (!account) {
             return res.status(404).json({ message: 'Account not found' });
         }
+
+        await Expense.findByIdAndDelete(id);
+
+        account.expenses = account.expenses.filter(expenseId => expenseId.toString() !== id);
 
         await account.updateBalanceAfterDeletingExpense(id);
 
@@ -97,12 +79,12 @@ exports.deleteExpense = async (req, res) => {
 }
 
 // You can add other functions similar to the income controller to handle recurring transactions if needed.
-exports.getUpcomingRecurringTransactions = async (req, res) => {
+exports.getUpcomingExpenses = async (req, res) => {
     try {
         const now = new Date();
-        const upcomingTransactions = [];
+        const upcomingExpenses = [];
 
-        const incomes = await Income.find({ 
+        const expenses = await Expense.find({
             'recurrence.frequency': { $exists: true },
             'recurrence.startDate': { $lte: now },
             $or: [
@@ -111,20 +93,20 @@ exports.getUpcomingRecurringTransactions = async (req, res) => {
             ]
         });
 
-        for (const income of incomes) {
-            let nextOccurrence = income.date;
+        for (const expense of expenses) {
+            let nextOccurrence = expense.date;
             while (nextOccurrence <= now) {
-                nextOccurrence = getNextOccurrence(income.recurrence.frequency, nextOccurrence);
+                nextOccurrence = getNextOccurrence(expense.recurrence.frequency, nextOccurrence);
             }
-            upcomingTransactions.push({
-                ...income._doc,
+            upcomingExpenses.push({
+                ...expense._doc,
                 nextOccurrence
             });
         }
 
-        res.status(200).json(upcomingTransactions);
+        res.status(200).json(upcomingExpenses);
     } catch (error) {
-        console.error('Error retrieving upcoming recurring transactions:', error);
-        res.status(500).json({ message: 'Server Errors' });
+        console.error('Error retrieving upcoming recurring expenses:', error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };

@@ -5,32 +5,25 @@ import { InnerLayout } from '../../styles/Layouts';
 import IncomeItem from '../incomeItem/IncomeItem';
 
 function Transaction() {
-    const { incomes, expenses, getIncome, getExpenses } = useGlobalContext();
+    const { upcomingTransactions, getUpcomingRecurringTransactions } = useGlobalContext();
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
     useEffect(() => {
-        getIncome();
-        getExpenses();
-        console.log('Testing 🚨🅿️: Transactions');
+        getUpcomingRecurringTransactions();
+        console.log('Fetching upcoming recurring transactions');
     }, []);
 
-    // Combine incomes and expenses into one array
-    const transactions = [...incomes, ...expenses];
+    useEffect(() => {
+        console.log('Upcoming Transactions:', upcomingTransactions);
+    }, [upcomingTransactions]);
 
-    // Filter transactions based on recurrence
-    const recurringTransactions = transactions.filter(transaction => transaction.recurrence);
+    // Simplify filtering logic
+    const filteredTransactions = upcomingTransactions.filter(transaction => transaction.nextOccurrence);
+    console.log('Filtered Transactions:', filteredTransactions);
 
-    // Filter recurring transactions based on the selected date range
-    const filteredTransactions = recurringTransactions.filter(transaction => {
-        const transactionDate = new Date(transaction.date);
-        const start = startDate ? new Date(startDate) : new Date('1900-01-01');
-        const end = endDate ? new Date(endDate) : new Date();
-        return transactionDate >= start && transactionDate <= end;
-    });
-
-    // Sort the filtered transactions by date
-    const sortedTransactions = filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedTransactions = filteredTransactions.sort((a, b) => new Date(a.nextOccurrence) - new Date(b.nextOccurrence));
+    console.log('Sorted Transactions:', sortedTransactions);
 
     return (
         <TransactionStyled>
@@ -60,7 +53,7 @@ function Transaction() {
                     </div>
                     <div className="transaction">
                         {sortedTransactions.map((transaction) => {
-                            const { _id, title, amount, date, category, description, type } = transaction;
+                            const { _id, title, amount, nextOccurrence, category, description, type } = transaction;
                             return (
                                 <IncomeItem
                                     key={_id}
@@ -68,10 +61,10 @@ function Transaction() {
                                     title={title}
                                     description={description}
                                     amount={amount}
-                                    date={date}
+                                    date={nextOccurrence}
                                     type={type}
                                     category={category}
-                                    indicatorColor={type === 'income' ? "var(--color-blue)" : "var(--color-red)"}
+                                    indicatorColor={type === 'income' ? "var(--color-blue)" : "var(--color-grey)"}
                                 />
                             );
                         })}
@@ -101,8 +94,8 @@ const TransactionStyled = styled.div`
             font-size: 2.5rem;
             font-weight: 800;
             color: var(--color-green);
-            color: var(--color-red);
             color: var(--color-blue);
+            color: var(--color-grey);
         }
     }
     .transaction-content {

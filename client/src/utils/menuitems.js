@@ -40,4 +40,11 @@ export const menuItems = [
         link: "/dashboard",
 
     },
+    {
+        id: 7,
+        title: "Account Transfer",
+        icon: expenses,
+        link: "/dashboard",
+
+    }
 ]
