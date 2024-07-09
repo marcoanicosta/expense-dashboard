@@ -13,17 +13,10 @@ export const GlobalProvider = ({ children }) => {
     const [incomes, setIncome] = useState([])
     const [expenses, setExpenses] = useState([])
     const [accounts, setAccounts] = useState([])
+    const [upcomingTransactions, setUpcomingTransactions] = useState([]);
     const [error, setError] = useState(null)
 
     // Income functions 🛰️
-    // const addIncome = async (income) => {
-    //     try {
-    //         const response = await axios.post('add-income', income);
-    //         getIncome();
-    //     } catch (err) {
-    //         setError(err.response ? err.response.data.message : err.message);
-    //     }
-    // };
     const addIncome = async (income) => {
         try { 
             const response = await axios.post(`${BASE_URL}add-income`, income, {
@@ -41,7 +34,6 @@ export const GlobalProvider = ({ children }) => {
             setError(err.response ? err.response.data.message : err.message);
         }
     };
-
     const getIncome = async () => {
         const response = await axios.get(`${BASE_URL}get-income`)
         setIncome(response.data)
@@ -79,7 +71,12 @@ export const GlobalProvider = ({ children }) => {
         console.log(response.data)
     }
     const deleteExpense = async (id) => {
-        const res  = await axios.delete(`${BASE_URL}delete-expense/${id}`)
+        try {
+            const response  = await axios.delete((`${BASE_URL}delete-expense/${id}`))
+            console.log(response.data)
+        } catch (err) {
+            setError(err.response ? err.response.data.message : err.message);
+        }
         getExpenses()
     }
     const totalExpenses = () => {
@@ -100,18 +97,15 @@ export const GlobalProvider = ({ children }) => {
             })
         getAccounts()
     }
-
     const getAccounts = async () => {
         const response = await axios.get(`${BASE_URL}get-account`)
         setAccounts(response.data)
         console.log("TESSSSSSTTTTT3 🚨🅿️", response.data)
     }
-
     const deleteAccount = async (id) => {
         const res  = await axios.delete(`${BASE_URL}delete-account/${id}`)
         getAccounts()
     }
-
     // const totalAccounts = () => {
     //     let totalIncome = 0;
     //     expenses.forEach((account) =>{
@@ -120,7 +114,6 @@ export const GlobalProvider = ({ children }) => {
 
     //     return totalIncome;
     // }
-
     const totalBalance = () => {
         return totalIncome() - totalExpenses()
     }
@@ -133,6 +126,36 @@ export const GlobalProvider = ({ children }) => {
 
         return history.slice(0, 3)
     }
+
+    const getUpcomingRecurringTransactions = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}upcoming-recurring-transactions`);
+            setUpcomingTransactions(response.data);
+            console.log('GET Upcoming Transactions:', response.data);
+        } catch (error) {
+            setError(error);
+        }
+    };
+
+
+    const transferBalance = async (fromAccountId, toAccountId, amount) => {
+        try {
+            const response = await axios.post(`${BASE_URL}transfer`, {
+                fromAccountId,
+                toAccountId,
+                amount
+            });
+            console.log(response.data);
+            getAccounts(); // Refresh accounts data
+        } catch (error) {
+            setError(error);
+        }
+    };
+
+    useEffect(() => {
+        getAccounts();
+        //getUpcomingRecurringTransactions();
+    }, []);
 
    console.log( 'total 🏦:', totalIncome())
 
@@ -156,6 +179,9 @@ export const GlobalProvider = ({ children }) => {
                 getAccounts,
                 deleteAccount,
                 accounts,
+                upcomingTransactions,
+                transferBalance,
+                getUpcomingRecurringTransactions
             }
         }>
             {children}

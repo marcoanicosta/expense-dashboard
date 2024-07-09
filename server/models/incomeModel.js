@@ -38,6 +38,21 @@ const IncomeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Account',
         required: true
+    },
+    recurrence: {
+        frequency: {
+            type: String,
+            enum: ['daily', 'weekly', 'monthly', 'yearly'],
+            required: false
+        },
+        startDate: {
+            type: Date,
+            required: false
+        },
+        endDate: {
+            type: Date,
+            required: false
+        }
     }
 }, {timestamps: true});
 

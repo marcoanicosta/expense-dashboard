@@ -6,10 +6,12 @@ import Navigation from './components/navigation/Navigation';
 import React, {useMemo, useState } from 'react';
 import Dashboard from './components/dashboard/Dashboard';
 import Transaction from './components/transaction/Transaction';
+import Upcoming from './components/transaction/Upcoming';
 import Income from './components/income/Income';
 import Expenses from './components/expenses/Expenses';
 import Accounts from './components/accounts/accounts';
 import { useGlobalContext } from './contexts/globalContexts';
+import Transfers from './components/accountTransfer/accountTransfer';
 
 function App() {
   const [active, setActive] = useState(1)
@@ -30,6 +32,10 @@ function App() {
         return <Income />
       case 5:
           return <Expenses />
+      case 6:
+          return <Upcoming />
+      case 7:
+          return <Transfers />
       default:
         return <Dashboard />
     }
@@ -39,7 +45,7 @@ function App() {
     return <Orb />
   },[])
   return (
-    <AppStyled bg={bg} className="App">
+    <AppStyled  className="App">
       {orbMemo}
       <MainLayout>
         <Navigation active={active} setActive={setActive} />
@@ -49,6 +55,8 @@ function App() {
       </MainLayout>
     </AppStyled>
   );
+
+  //old     <AppStyled bg={bg} className="App">
 }
 
 
