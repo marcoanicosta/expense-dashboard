@@ -2,7 +2,7 @@ const Account = require("../models/accountsModel");
 const CreditAccount = require('../models/creditAccountModel');
 const LoanAccount = require('../models/loanAccountModel');
 const Income = require('../models/incomeModel');
-const Expense = require('../models/ExpenseModel');
+const Expense = require('../models/expenseModel');
 
 
 
@@ -73,19 +73,33 @@ exports.getAccount = async (req, res) => {
     }
 }
 exports.deleteAccount = async (req, res) => {
-    const { id } = req.params; // get the id from the request parameters
-    console.log(id);
-    
+    const { id } = req.params;
+    console.log(id, "MY ID 🚨");
+
     try {
-        const account = await Account.findByIdAndDelete(id);
+        // Find the account to be deleted
+        const account = await Account.findById(id);
         if (!account) {
+            console.log('Account not found with id:', id);
             return res.status(404).json({ message: 'Account not found' });
         }
-        res.status(200).json({ message: 'Account deleted successfully' });
+
+        // Log the found account
+        console.log('Found account:', account);
+
+        // Delete associated incomes and expenses
+        await Income.deleteMany({ account: id });
+        await Expense.deleteMany({ account: id });
+
+        // Delete the account
+        await Account.deleteOne({ _id: id });
+
+        res.status(200).json({ message: 'Account and associated transactions deleted successfully' });
     } catch (error) {
+        console.error('Error deleting account:', error);
         res.status(500).json({ message: 'Server Error', error });
     }
-}
+};
 exports.transferBalance = async (req, res) => {
     const { fromAccountId, toAccountId, amount } = req.body;
 

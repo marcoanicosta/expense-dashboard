@@ -68,14 +68,22 @@ exports.deleteIncome = async (req, res) => {
         // Find the income to be deleted
         const income = await Income.findById(id);
         if (!income) {
-            return res.status(404).json({ message: 'Income not found' });
+            console.log('Income not found with id:', id);
+            return res.status(404).json({ message: 'Income is not found' });
         }
 
+        // Log the found income
+        console.log('Found income:', income);
+
         // Find the account associated with this income
-        const account = await Accounts.findById(income.account);
+        const account = await Account.findById(income.account);
         if (!account) {
+            console.log('Account not found for income:', income.account);
             return res.status(404).json({ message: 'Account not found' });
         }
+
+        // Log the found account
+        console.log('Found account:', account);
 
         // Delete the income
         await Income.findByIdAndDelete(id);
@@ -84,10 +92,11 @@ exports.deleteIncome = async (req, res) => {
         account.incomes = account.incomes.filter(incomeId => incomeId.toString() !== id);
 
         // Update the account's balance
-        await account.updateBalanceAfterRemovingIncome(id); // Ensure this method exists and works as expected
+        await account.save();
 
         res.status(200).json({ message: 'Income deleted and account updated successfully' });
     } catch (error) {
+        console.error('Error deleting income:', error);
         res.status(500).json({ message: 'Server Error', error });
     }
 };

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Income = require('./incomeModel');
+const Expense = require('./expenseModel');
 
 
 const AccountSchema = new mongoose.Schema({
@@ -31,6 +33,20 @@ const AccountSchema = new mongoose.Schema({
         ref: 'Expense'
     }]
 }, {timestamps: true});
+
+// Middleware to handle cascading delete
+AccountSchema.pre('remove', async function(next) {
+    try {
+      console.log(`Deleting incomes and expenses for account: ${this._id}`);
+      const incomeDeletionResult = await Income.deleteMany({ account: this._id });
+      const expenseDeletionResult = await Expense.deleteMany({ account: this._id });
+      console.log('Income deletion result:', incomeDeletionResult);
+      console.log('Expense deletion result:', expenseDeletionResult);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 // Method to calculate the balance
 AccountSchema.methods.calculateBalance = async function() {
@@ -80,6 +96,6 @@ AccountSchema.methods.updateBalanceAfterRemovingExpense = async function(expense
     await this.save();
 };
 
+const Account = mongoose.models.Account || mongoose.model('Account', AccountSchema);
 
-module.exports = mongoose.model('Accounts', AccountSchema);
-
+module.exports = Account;

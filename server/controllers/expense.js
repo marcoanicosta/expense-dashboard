@@ -1,4 +1,4 @@
-const Expense = require("../models/ExpenseModel");
+const Expense = require("../models/expenseModel");
 const Accounts = require("../models/accountsModel");
 const { getNextOccurrence } = require('../utils/utils');
 
