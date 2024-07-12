@@ -55,6 +55,7 @@ exports.getExpense = async (req, res) => {
 exports.deleteExpense = async (req, res) => {
     const { id } = req.params; // Get the id from the request parameters
     console.log(id);
+    
     try {
         const expense = await Expense.findById(id);
         if (!expense) {

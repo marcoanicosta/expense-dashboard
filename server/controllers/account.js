@@ -74,25 +74,21 @@ exports.getAccount = async (req, res) => {
 }
 exports.deleteAccount = async (req, res) => {
     const { id } = req.params;
-    console.log(id, "MY ID 🚨");
+    console.log(id);
 
     try {
-        // Find the account to be deleted
         const account = await Account.findById(id);
         if (!account) {
-            console.log('Account not found with id:', id);
             return res.status(404).json({ message: 'Account not found' });
         }
 
-        // Log the found account
-        console.log('Found account:', account);
-
-        // Delete associated incomes and expenses
+        // Delete all associated incomes
         await Income.deleteMany({ account: id });
+        // Delete all associated expenses
         await Expense.deleteMany({ account: id });
 
         // Delete the account
-        await Account.deleteOne({ _id: id });
+        await Account.findByIdAndDelete(id);
 
         res.status(200).json({ message: 'Account and associated transactions deleted successfully' });
     } catch (error) {
@@ -100,6 +96,8 @@ exports.deleteAccount = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error });
     }
 };
+
+//Updated to handle cascading delete
 exports.transferBalance = async (req, res) => {
     const { fromAccountId, toAccountId, amount } = req.body;
 
@@ -155,6 +153,7 @@ exports.transferBalance = async (req, res) => {
 
         res.status(200).json({ message: 'Transfer successful' });
     } catch (error) {
+        console.error('Error during transfer:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };

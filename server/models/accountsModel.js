@@ -80,13 +80,17 @@ AccountSchema.methods.updateBalanceAfterAddingExpense = async function(expenseId
     console.log("ALERT 🚨")
 };
 
-// Middleware to update balance after removing income
-AccountSchema.methods.updateBalanceAfterRemovingIncome = async function(incomeId) {
-    this.incomes.pull(incomeId);
-    this.balance = await this.calculateBalance();
-    await this.save();
-    console.log("ALERT 🚨")
-    console.log("ALERT 🚨", this.incomes, this.balance)
+AccountSchema.methods.updateBalanceAfterRemovingIncome = async function (incomeId) {
+    try {
+        // Assuming you have a method to recalculate the balance after removing an income
+        const income = await Income.findById(incomeId);
+        if (income) {
+            this.balance -= income.amount;
+            await this.save();
+        }
+    } catch (error) {
+        console.error('Error updating account balance after removing income:', error);
+    }
 };
 
 // Middleware to update balance after removing expense
