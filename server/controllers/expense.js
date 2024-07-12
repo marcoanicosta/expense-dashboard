@@ -1,4 +1,4 @@
-const Expense = require("../models/ExpenseModel");
+const Expense = require("../models/expenseModel");
 const Accounts = require("../models/accountsModel");
 const { getNextOccurrence } = require('../utils/utils');
 
@@ -55,6 +55,7 @@ exports.getExpense = async (req, res) => {
 exports.deleteExpense = async (req, res) => {
     const { id } = req.params; // Get the id from the request parameters
     console.log(id);
+    
     try {
         const expense = await Expense.findById(id);
         if (!expense) {

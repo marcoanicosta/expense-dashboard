@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Income = require('./incomeModel');
+const Expense = require('./expenseModel');
 
 
 const AccountSchema = new mongoose.Schema({
@@ -32,6 +34,20 @@ const AccountSchema = new mongoose.Schema({
     }]
 }, {timestamps: true});
 
+// Middleware to handle cascading delete
+AccountSchema.pre('remove', async function(next) {
+    try {
+      console.log(`Deleting incomes and expenses for account: ${this._id}`);
+      const incomeDeletionResult = await Income.deleteMany({ account: this._id });
+      const expenseDeletionResult = await Expense.deleteMany({ account: this._id });
+      console.log('Income deletion result:', incomeDeletionResult);
+      console.log('Expense deletion result:', expenseDeletionResult);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+
 // Method to calculate the balance
 AccountSchema.methods.calculateBalance = async function() {
     const incomeDocs = await mongoose.model('Income').find({ _id: { $in: this.incomes } });
@@ -64,13 +80,17 @@ AccountSchema.methods.updateBalanceAfterAddingExpense = async function(expenseId
     console.log("ALERT 🚨")
 };
 
-// Middleware to update balance after removing income
-AccountSchema.methods.updateBalanceAfterRemovingIncome = async function(incomeId) {
-    this.incomes.pull(incomeId);
-    this.balance = await this.calculateBalance();
-    await this.save();
-    console.log("ALERT 🚨")
-    console.log("ALERT 🚨", this.incomes, this.balance)
+AccountSchema.methods.updateBalanceAfterRemovingIncome = async function (incomeId) {
+    try {
+        // Assuming you have a method to recalculate the balance after removing an income
+        const income = await Income.findById(incomeId);
+        if (income) {
+            this.balance -= income.amount;
+            await this.save();
+        }
+    } catch (error) {
+        console.error('Error updating account balance after removing income:', error);
+    }
 };
 
 // Middleware to update balance after removing expense
@@ -80,6 +100,6 @@ AccountSchema.methods.updateBalanceAfterRemovingExpense = async function(expense
     await this.save();
 };
 
+const Account = mongoose.models.Account || mongoose.model('Account', AccountSchema);
 
-module.exports = mongoose.model('Accounts', AccountSchema);
-
+module.exports = Account;
