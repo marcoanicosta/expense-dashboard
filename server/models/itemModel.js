@@ -17,7 +17,7 @@ const ItemSchema = new mongoose.Schema({
     },
     due_date: { 
         type: Date,
-        required: true,
+        required: false,
     },
     instalments: {
         type: Number,
