@@ -6,6 +6,7 @@ import Navigation from './components/navigation/Navigation';
 import React, {useMemo, useState } from 'react';
 import Dashboard from './components/dashboard/Dashboard';
 import Transaction from './components/transaction/Transaction';
+import Items from './components/items/item';
 import Upcoming from './components/transaction/Upcoming';
 import Income from './components/income/Income';
 import Expenses from './components/expenses/Expenses';
@@ -36,6 +37,8 @@ function App() {
           return <Upcoming />
       case 7:
           return <Transfers />
+      case 8:
+          return <Items />
       default:
         return <Dashboard />
     }

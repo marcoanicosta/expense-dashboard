@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const db = require('./db/db');
@@ -8,7 +7,7 @@ const handleRecurringTransactions = require('./schedulers/scheduler');
 
 const app = express();
 require('dotenv').config()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 5001;
 
 //middlewares
 app.use(express.json());
@@ -30,13 +29,15 @@ const server = () => {
     
         // Start the cron job after successful DB connection
         handleRecurringTransactions();
+
+        // Start HTTP server after DB connection
+        app.listen(PORT, () => {
+            console.log(`Server is listening on port ${PORT}... 🚀`);
+        });
     }).catch((error) => {
         logger.error(`Database connection error: ${error.message}`);
+        process.exit(1);
     });
-    
-    app.listen(PORT, () => {
-        console.log(`Server is liseting to port ${PORT}... 🚀`);
-    })
 }
 
 server()

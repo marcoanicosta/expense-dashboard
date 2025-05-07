@@ -9,11 +9,18 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 function Chart() {
     const {incomes, expenses} = useGlobalContext()
 
+    const sortedIncomes = [...incomes].sort((a, b) => new Date(a.date) - new Date(b.date))
+    const sortedExpenses = [...expenses].sort((a, b) => new Date(a.date) - new Date(b.date))
+
     const data = {
         labels: incomes.map((inc) =>{
+            console.log(inc, 'INC 🛩️🛩️🛩️🛩️🛩️🛩️')
             const {date} = inc
+            console.log(inc, 'NEW INC 🛩️🛩️🛩️🛩️🛩️🛩️')
             return dateFormat(date)
         }),
+
+    
 
         datasets: [
             {
