@@ -20,7 +20,7 @@ const AccountSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ['normal', 'cash', 'savings', 'credit', 'loan'], // Add other types as needed
+        enum: ['normal', 'cash', 'savings', 'credit', 'loan', 'business'], // Add other types as needed
         default: 'normal'
     },
 

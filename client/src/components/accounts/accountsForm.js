@@ -23,15 +23,23 @@ function AccountsForm() {
     }
 
     const handleSubmit = e => {
-        e.preventDefault()
-        addAccount(inputState)
+        e.preventDefault();
+    
+        const parsedBalance = parseFloat(inputState.balance);
+        const accountToSubmit = {
+            ...inputState,
+            balance: isNaN(parsedBalance) ? 0 : parsedBalance
+        };
+    
+        console.log("Submitting:", accountToSubmit);
+        addAccount(accountToSubmit);
+    
         setInputState({
             account_name: '',
             balance: '',
             type: '',
-
-        })
-    }
+        });
+    };
 
     return (
         <AccountsFormStyled onSubmit={handleSubmit}>
@@ -71,6 +79,7 @@ function AccountsForm() {
                     <option value="cash">Cash</option>
                     <option value="savings">Savings</option>
                     <option value="credit">Credit</option>
+                    <option value="business">Business</option>
                 </select>
             </div>
             {/* <div className="input-control">
