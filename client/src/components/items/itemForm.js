@@ -17,7 +17,7 @@ function ItemsForm() {
         type: '',
     });
 
-    const { item_name, balance, date, type,description } = inputState;
+    const { item_name, price, date, type,description } = inputState;
 
     const handleInput = name => e => {
         setInputState({...inputState, [name]: e.target.value});
@@ -26,6 +26,7 @@ function ItemsForm() {
 
     const handleSubmit = e => {
         e.preventDefault()
+        console.log("SUBMITTING ITEM:", inputState); // ✅ Add this
         addItem(inputState)
         setInputState({
             item_name: '',
@@ -49,11 +50,11 @@ function ItemsForm() {
                 />
             </div>
             <div className="input-control">
-                <input value={balance}  
+                <input value={price}  
                     type="text" 
-                    name={'balance'} 
-                    placeholder={'Items Balance'}
-                    onChange={handleInput('balance')} 
+                    name={'price'} 
+                    placeholder={'Items Price'}
+                    onChange={handleInput('price')} 
                 />
             </div>
             {/* <div className="input-control">

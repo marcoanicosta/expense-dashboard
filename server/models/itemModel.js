@@ -19,6 +19,11 @@ const ItemSchema = new mongoose.Schema({
         type: Date,
         required: false,
     },
+    account: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account',
+        required: false // Optional for non-credit purchases
+    },
     instalments: {
         type: Number,
         required: false,

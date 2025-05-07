@@ -109,12 +109,18 @@ export const GlobalProvider = ({ children }) => {
     }
 
     // Item functions 🛰️
-    const addItem = async (account) => {
-        const response = await axios.post(`${BASE_URL}add-item`, account)
-            .catch((err) =>{
-                setError(err.response.data.message)
-            })
-        getAccounts()
+    const addItem = async (item) => {
+        try {
+            const response = await axios.post(`${BASE_URL}add-item`, item, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Item added successfully:', response.data);
+            getItems(); // ✅ this is the correct refresh call
+        } catch (err) {
+            setError(err.response ? err.response.data.message : err.message);
+        }
     }
     const getItems = async () => {
         const response = await axios.get(`${BASE_URL}get-item`)
