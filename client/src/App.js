@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import bg from './img/bg.png'
 import { MainLayout } from './styles/Layouts'
 import Orb from "./components/orb/Orb";
-import Navigation from './components/navigation/Navigation';
+import Navigation from './components/navigation/navigation';
 import React, {useMemo, useState } from 'react';
 import Dashboard from './components/dashboard/Dashboard';
 import Transaction from './components/transaction/Transaction';
@@ -13,6 +13,7 @@ import Expenses from './components/expenses/Expenses';
 import Accounts from './components/accounts/accounts';
 import { useGlobalContext } from './contexts/globalContexts';
 import Transfers from './components/accountTransfer/accountTransfer';
+import CreditHealth from './components/credit/creditHealth';
 
 function App() {
   const [active, setActive] = useState(1)
@@ -39,6 +40,8 @@ function App() {
           return <Transfers />
       case 8:
           return <Items />
+      case 9:
+          return <CreditHealth />;
       default:
         return <Dashboard />
     }

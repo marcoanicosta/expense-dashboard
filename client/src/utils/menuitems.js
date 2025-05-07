@@ -53,5 +53,10 @@ export const menuItems = [
         icon: transactions,
         link: "/dashboard",
 
+    },
+    {
+        id: 9,
+        title: 'Credit',
+        icon: <i className="fas fa-credit-card"></i>
     }
 ]
