@@ -17,9 +17,9 @@ function Items() {
     }, [])
 
     // Filter items based on the selected filter
-    // const filteredItems = items.filter(item => 
-    //   filter === 'all' ? true : item.type === filter
-    // );
+    const filteredItems = items.filter(item => 
+      filter === 'all' ? true : item.type === filter
+    );
 
     return (
       <ItemsStyled>
@@ -32,19 +32,25 @@ function Items() {
             </div>
             <div className="filter-container">
               <label>Filter by type: </label>
-            
+              <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">All</option>
+                <option value="normal">Normal</option>
+                <option value="cash">Cash</option>
+                <option value="savings">Savings</option>
+                <option value="credit">Credit</option>
+              </select>
             </div>
             <div className="items">
-                {items.map(item => {
-                    return (
-                    <ItemsComponentItem 
-                        key={item._id}
-                        {...item}
-                        price={item.price}
-                        deleteItem={deleteItem}
-                    />
-                    )
-                })}
+            {filteredItems.map(item => {
+                  return (
+                      <ItemsComponentItem 
+                          key={item._id}
+                          {...item}
+                          price={item.price}
+                          deleteItem={deleteItem}
+                      />
+                  );
+              })}
             </div>
           </div>
         </InnerLayout>

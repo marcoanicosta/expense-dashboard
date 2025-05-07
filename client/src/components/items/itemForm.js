@@ -12,14 +12,16 @@ function ItemsForm() {
     const [inputState, setInputState] = useState({
         item_name: '',
         price: '',
+        due_date: null,
+        instalments: '',
         type: '',
-    })
+    });
 
     const { item_name, balance, date, type,description } = inputState;
 
-    const handleInput = item_name => e => {
-        setInputState({...inputState, [item_name]: e.target.value})
-        setError('')
+    const handleInput = name => e => {
+        setInputState({...inputState, [name]: e.target.value});
+        setError('');
     }
 
     const handleSubmit = e => {
@@ -27,10 +29,11 @@ function ItemsForm() {
         addItem(inputState)
         setInputState({
             item_name: '',
-            balance: '',
+            price: '',
+            due_date: null,
+            instalments: '',
             type: '',
-
-        })
+        });
     }
 
     return (
@@ -72,6 +75,24 @@ function ItemsForm() {
                     <option value="savings">Savings</option>
                     <option value="credit">Credit</option>
                 </select>
+            </div>
+            <div className="input-control">
+                <DatePicker 
+                    placeholderText="Due Date"
+                    selected={inputState.due_date}
+                    onChange={(date) => setInputState({...inputState, due_date: date})}
+                    dateFormat="dd/MM/yyyy"
+                />
+            </div>
+
+            <div className="input-control">
+                <input 
+                    type="number"
+                    value={inputState.instalments}
+                    name="instalments"
+                    placeholder="Number of Instalments"
+                    onChange={handleInput('instalments')}
+                />
             </div>
             {/* <div className="input-control">
                 <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
