@@ -13,6 +13,7 @@ export const GlobalProvider = ({ children }) => {
     const [incomes, setIncome] = useState([])
     const [expenses, setExpenses] = useState([])
     const [accounts, setAccounts] = useState([])
+    const [items, setItems] = useState([])
     const [upcomingTransactions, setUpcomingTransactions] = useState([]);
     const [error, setError] = useState(null)
 
@@ -106,6 +107,30 @@ export const GlobalProvider = ({ children }) => {
         const res  = await axios.delete(`${BASE_URL}delete-account/${id}`)
         getAccounts()
     }
+
+    // Item functions 🛰️
+    const addItem = async (item) => {
+        try {
+            const response = await axios.post(`${BASE_URL}add-item`, item, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Item added successfully:', response.data);
+            getItems(); // ✅ this is the correct refresh call
+        } catch (err) {
+            setError(err.response ? err.response.data.message : err.message);
+        }
+    }
+    const getItems = async () => {
+        const response = await axios.get(`${BASE_URL}get-item`)
+        setItems(response.data)
+    }
+    const deleteItem = async (id) => {
+        const res  = await axios.delete(`${BASE_URL}delete-item/${id}`)
+        getItems()
+    }
+
     // const totalAccounts = () => {
     //     let totalIncome = 0;
     //     expenses.forEach((account) =>{
@@ -181,7 +206,11 @@ export const GlobalProvider = ({ children }) => {
                 accounts,
                 upcomingTransactions,
                 transferBalance,
-                getUpcomingRecurringTransactions
+                getUpcomingRecurringTransactions,
+                getItems,
+                addItem,
+                deleteItem,
+                items
             }
         }>
             {children}
