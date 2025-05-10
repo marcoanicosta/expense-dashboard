@@ -5,14 +5,20 @@ const Account = require('../models/accountsModel');
 
 
 exports.addItem = async (req, res) => {
-    const { item_name, price, due_date, instalments, account } = req.body;
+    const { item_name, price, due_date, instalments, account, fuelType, litres, location, carName } = req.body;
 
     let item = new Item({
         item_name,
         price,
         due_date,
         instalments,
-        account
+        account,
+        extra: {
+          fuelType,
+          litres,
+          location,
+          carName
+        }
     });
 
     try {

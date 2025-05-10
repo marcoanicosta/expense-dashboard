@@ -39,6 +39,15 @@ const ItemSchema = new mongoose.Schema({
         type: Date,
         required: false,
     },
+    extra: {
+        litres: { type: Number },
+        location: { type: String },
+        carName: { type: String },
+        fuelType: {
+          type: String,
+          enum: ['petrol', 'diesel', 'electric']
+        }
+    }
 }, { timestamps: true });
 
 ItemSchema.methods.updateCompletionDate = async function() {
