@@ -15,6 +15,11 @@ function ItemsForm() {
         due_date: null,
         instalments: '',
         type: '',
+        linkedAccount: '',
+        fuelType: '',
+        litres: '',
+        location: '',
+        carName: '',
     });
 
     const { item_name, price, date, type,description } = inputState;
@@ -31,10 +36,14 @@ function ItemsForm() {
         setInputState({
             item_name: '',
             price: '',
-            account: inputState.linkedAccount,
             due_date: null,
             instalments: '',
             type: '',
+            linkedAccount: '',
+            fuelType: '',
+            litres: '',
+            location: '',
+            carName: '',
         });
     }
 
@@ -113,6 +122,45 @@ function ItemsForm() {
                     onChange={handleInput('instalments')}
                 />
             </div>
+            {inputState.type === 'fuel' && (
+            <>
+                <div className="input-control">
+                <select value={inputState.fuelType} onChange={handleInput('fuelType')}>
+                    <option value="">Select Fuel Type</option>
+                    <option value="petrol">Petrol</option>
+                    <option value="diesel">Diesel</option>
+                    <option value="electric">Electric</option>
+                </select>
+                </div>
+                <div className="input-control">
+                <input 
+                    type="number"
+                    value={inputState.litres}
+                    name="litres"
+                    placeholder="Litres"
+                    onChange={handleInput('litres')}
+                />
+                </div>
+                <div className="input-control">
+                <input 
+                    type="text"
+                    value={inputState.location}
+                    name="location"
+                    placeholder="Fuel Location"
+                    onChange={handleInput('location')}
+                />
+                </div>
+                <div className="input-control">
+                <input 
+                    type="text"
+                    value={inputState.carName}
+                    name="carName"
+                    placeholder="Car Name"
+                    onChange={handleInput('carName')}
+                />
+                </div>
+            </>
+            )}
             {/* <div className="input-control">
                 <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
             </div> */}
