@@ -8,7 +8,7 @@ import { accounts, plus } from '../../utils/Icons';
 
 
 function ExpenseForm() {
-    const {addExpense, error, setError, accounts} = useGlobalContext()
+    const {addExpense, error, setError, accounts, items} = useGlobalContext()
     const [inputState, setInputState] = useState({
         title: '',
         amount: '',
@@ -16,6 +16,9 @@ function ExpenseForm() {
         category: '',
         description: '',
         accountId:  '',
+        litres: '',
+        location: '',
+        fuelItemId: ''
     })
 
     const { title, amount, date, category, description, accountId } = inputState;
@@ -46,6 +49,9 @@ function ExpenseForm() {
             category: '',
             description: '',
             accountId: '',
+            litres: '',
+            location: '',
+            fuelItemId: ''
         })
     }
 
@@ -106,6 +112,40 @@ function ExpenseForm() {
                     ))}
                 </select>
             </div>
+            {inputState.category === 'fuel' && (
+                <>
+                    <div className="input-control">
+                        <input 
+                            type="number"
+                            value={inputState.litres}
+                            name="litres"
+                            placeholder="Litres"
+                            onChange={handleInput('litres')}
+                        />
+                    </div>
+                    <div className="input-control">
+                        <input 
+                            type="text"
+                            value={inputState.location}
+                            name="location"
+                            placeholder="Fuel Location"
+                            onChange={handleInput('location')}
+                        />
+                    </div>
+                    <div className="selects input-control">
+                        <select value={inputState.fuelItemId} onChange={handleInput('fuelItemId')}>
+                            <option value="">Assign to Fuel Item (optional)</option>
+                            {items
+                                .filter(item => item.type === 'fuel')
+                                .map(item => (
+                                    <option key={item._id} value={item._id}>
+                                        {item.item_name}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+                </>
+            )}
             <div className="submit-btn">
                 <Button 
                     name={'Add Expense'}

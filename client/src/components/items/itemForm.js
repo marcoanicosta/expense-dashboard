@@ -60,13 +60,16 @@ function ItemsForm() {
                 />
             </div>
             <div className="input-control">
-                <input value={price}  
+                <input 
+                    value={price}  
                     type="text" 
                     name={'price'} 
                     placeholder={'Items Price'}
-                    onChange={handleInput('price')} 
+                    onChange={handleInput('price')}
+                    disabled={inputState.type === 'fuel'}
                 />
             </div>
+            
             {/* <div className="input-control">
                 <DatePicker 
                     id='date'
