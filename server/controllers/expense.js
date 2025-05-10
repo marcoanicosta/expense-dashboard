@@ -3,7 +3,7 @@ const Accounts = require("../models/accountsModel");
 const { getNextOccurrence } = require('../utils/utils');
 
 exports.addExpense = async (req, res) => {
-    const { title, amount, type, date, category, description, accountId, recurrence } = req.body;
+    const { title, amount, type, date, category, description, accountId, recurrence, extra } = req.body;
 
     const expense = new Expense({
         title,
@@ -17,6 +17,12 @@ exports.addExpense = async (req, res) => {
             frequency: recurrence.frequency,
             startDate: recurrence.startDate,
             endDate: recurrence.endDate || null
+        } : undefined,
+        extra: (category === 'fuel' && extra) ? {
+            litres: extra.litres,
+            location: extra.location,
+            carName: extra.carName,
+            fuelType: extra.fuelType
         } : undefined
     });
 
