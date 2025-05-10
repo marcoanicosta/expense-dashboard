@@ -8,7 +8,7 @@ import { plus } from '../../utils/Icons';
 
 
 function ItemsForm() {
-    const {addItem, error, setError} = useGlobalContext()
+    const {addItem, accounts, error, setError} = useGlobalContext()
     const [inputState, setInputState] = useState({
         item_name: '',
         price: '',
@@ -31,6 +31,7 @@ function ItemsForm() {
         setInputState({
             item_name: '',
             price: '',
+            account: inputState.linkedAccount,
             due_date: null,
             instalments: '',
             type: '',
@@ -77,6 +78,23 @@ function ItemsForm() {
                     <option value="credit">Credit</option>
                 </select>
             </div>
+            {inputState.type && (
+                <div className="input-control">
+                    <select
+                        value={inputState.linkedAccount || ''}
+                        onChange={handleInput('linkedAccount')}
+                    >
+                        <option value="">Select Account (Optional)</option>
+                        {accounts
+                            .filter(acc => acc.type === inputState.type)
+                            .map(acc => (
+                                <option key={acc._id} value={acc._id}>
+                                    {acc.account_name}
+                                </option>
+                            ))}
+                    </select>
+                </div>
+            )}
             <div className="input-control">
                 <DatePicker 
                     placeholderText="Due Date"

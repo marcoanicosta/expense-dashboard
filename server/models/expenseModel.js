@@ -21,17 +21,20 @@ const ExpenseSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true,
+        default: Date.now,
         trim: true
     },
     category: {
         type: String,
         required: true,
+        default: 'Misc',
         trim: true
     },
     description: {
         type: String,
         required: true,
         maxLength:  20,
+        default: '—', maxLength: 20,
         trim: true
     },
     account: {

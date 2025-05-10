@@ -64,14 +64,26 @@ exports.addAccount = async (req, res) => {
             res.status(500).json({ message: 'Server Error' });
         }
     }
-exports.getAccount = async (req, res) => { 
-    try {
-        const accounts = await Account.find().sort({ createdAt: -1 }); //sort the data in descending order
-        res.status(200).json(accounts);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error', error });
-    }
-}
+    
+exports.getAccount = async (req, res) => {
+        try {
+          // 1) load all accounts
+          let accounts = await Account.find();
+        
+          // 2) for each account, recalc & persist its balance
+          await Promise.all(accounts.map(async acc => {
+            acc.balance = await acc.calculateBalance();
+            return acc.save();
+          }));
+        
+          // 3) fetch them again (now with updated .balance) and send
+          accounts = await Account.find().sort({ createdAt: -1 });
+          res.status(200).json(accounts);
+        } catch (error) {
+          res.status(500).json({ message: 'Server Error', error });
+        }
+      };
+
 exports.deleteAccount = async (req, res) => {
     const { id } = req.params;
     console.log(id);
