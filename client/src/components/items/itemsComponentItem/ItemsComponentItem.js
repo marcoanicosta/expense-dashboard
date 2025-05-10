@@ -60,6 +60,8 @@ function ItemsComponentItem({
                 return clothing;
             case 'travelling':
                 return freelance;
+            case 'fuel':
+                return piggy;
             case 'other':
                 return circle;
             default:

@@ -81,10 +81,8 @@ function ItemsForm() {
             <div className="selects input-control">
                 <select required value={type} name="type" id="type" onChange={handleInput('type')}>
                     <option value="" disabled >Select Option</option>
-                    <option value="normal">normal</option>
-                    <option value="cash">Cash</option>
-                    <option value="savings">Savings</option>
-                    <option value="credit">Credit</option>
+                    <option value="standard">Standard</option>
+                    <option value="fuel">Fuel</option>
                 </select>
             </div>
             {inputState.type && (

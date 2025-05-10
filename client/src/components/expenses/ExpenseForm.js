@@ -91,6 +91,7 @@ function ExpenseForm() {
                     <option value="clothing">Clothing</option>  
                     <option value="travelling">Travelling</option>  
                     <option value="other">Other</option>  
+                    <option value="fuel">Fuel</option>
                 </select>
             </div>
             <div className="input-control">
