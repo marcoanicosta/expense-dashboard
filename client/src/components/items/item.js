@@ -8,7 +8,7 @@ import ItemsComponentItem from './itemsComponentItem/ItemsComponentItem'
 //import ItemsItem from '../itemsItem/ItemsItem'
 
 function Items() {
-    const {addItem, items, getItems, deleteItem} = useGlobalContext()
+    const {addItem, items, getItems, deleteItem, accounts, handleAssignAccount} = useGlobalContext()
     const [filter, setFilter] = useState('all'); // State to manage the selected filter
 
     useEffect(() =>{
@@ -17,9 +17,15 @@ function Items() {
     }, [])
 
     // Filter items based on the selected filter
-    const filteredItems = items.filter(item => 
-      filter === 'all' ? true : item.type === filter
-    );
+    const filteredItems = items.filter(item => {
+      if (filter === 'all') return true;
+      if (filter === 'assigned') return item.account;
+      if (filter === 'unassigned') return !item.account;
+      return item.type === filter;
+    });
+    // const filteredItems = items.filter(item => 
+    //   filter === 'all' ? true : item.type === filter
+    // );
 
     return (
       <ItemsStyled>
@@ -34,6 +40,8 @@ function Items() {
               <label>Filter by type: </label>
               <select value={filter} onChange={(e) => setFilter(e.target.value)}>
                 <option value="all">All</option>
+                <option value="assigned">Assigned</option>
+                <option value="unassigned">Unassigned</option>
                 <option value="normal">Normal</option>
                 <option value="cash">Cash</option>
                 <option value="savings">Savings</option>
@@ -45,9 +53,12 @@ function Items() {
                   return (
                       <ItemsComponentItem 
                           key={item._id}
+                          id={item._id}
                           {...item}
                           price={item.price}
                           deleteItem={deleteItem}
+                          accounts={accounts}
+                          handleAssignAccount={handleAssignAccount}
                       />
                   );
               })}

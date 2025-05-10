@@ -70,6 +70,7 @@ export const GlobalProvider = ({ children }) => {
         const response = await axios.get(`${BASE_URL}get-expense`)
         setExpenses(response.data)
         console.log(response.data)
+        await getAccounts()
     }
     const deleteExpense = async (id) => {
         try {
@@ -125,11 +126,34 @@ export const GlobalProvider = ({ children }) => {
     const getItems = async () => {
         const response = await axios.get(`${BASE_URL}get-item`)
         setItems(response.data)
+        await getAccounts()
     }
     const deleteItem = async (id) => {
         const res  = await axios.delete(`${BASE_URL}delete-item/${id}`)
         getItems()
     }
+
+
+    const handleAssignAccount = async (itemId, accountId) => {
+        try {
+          const { data } = await axios.patch(
+            `${BASE_URL}assign-account/${itemId}`,
+            { accountId }
+          );
+          console.log('✅ Assigned:', data);
+      
+          // refresh both sides of truth
+          await getItems();    // so your ItemsComponentItem sees its new expense
+          await getAccounts(); // so your credit‐health view sees the new balance
+          await getExpenses();   // for the "Recent Expenses" list
+      
+          alert('Account assigned successfully ✅');
+        } catch (err) {
+          console.error('❌ Error assigning account:', err);
+          setError(err.response?.data?.message || err.message);
+          alert('❌ Failed to assign account');
+        }
+      };
 
     // const totalAccounts = () => {
     //     let totalIncome = 0;
@@ -203,6 +227,7 @@ export const GlobalProvider = ({ children }) => {
                 addAccount,
                 getAccounts,
                 deleteAccount,
+                handleAssignAccount,
                 accounts,
                 upcomingTransactions,
                 transferBalance,

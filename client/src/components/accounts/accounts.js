@@ -39,6 +39,7 @@ function Accounts() {
                 <option value="savings">Savings</option>
                 <option value="credit">Credit</option>
                 <option value="loan">Loan</option>      
+                <option value="business">Business</option>
               </select>
             </div>
             <div className="accounts">

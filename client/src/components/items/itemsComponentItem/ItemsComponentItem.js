@@ -15,6 +15,9 @@ function ItemsComponentItem({
     category,
     description,
     deleteItem,
+    account,
+    accounts,
+    handleAssignAccount,
     indicatorColor,
     type
 }) {
@@ -81,6 +84,19 @@ function ItemsComponentItem({
                         </p>
                     </div>
                     <div className="btn-con">
+                        {!account && accounts && (
+                            <select
+                                onChange={e => handleAssignAccount(id, e.target.value)}
+                                style={{ marginRight: '0.5rem' }}
+                            >
+                                <option value="">Assign Account</option>
+                                {accounts.map(acc => (
+                                    <option key={acc._id} value={acc._id}>
+                                        {acc.account_name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
                         <Button 
                             icon={trash}
                             bPad={'1rem'}
@@ -94,7 +110,7 @@ function ItemsComponentItem({
                     </div>
                 </div>
             </div>
-
+  
         
         </ItemItemStyled>
     )
