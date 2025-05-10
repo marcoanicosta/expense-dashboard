@@ -56,6 +56,27 @@ const ExpenseSchema = new mongoose.Schema({
             type: Date,
             required: false
         }
+    },
+    extra: {
+        litres: {
+            type: Number,
+            required: false
+        },
+        location: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        carName: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        fuelType: {
+            type: String,
+            enum: ['petrol', 'diesel', 'electric'],
+            required: false
+        }
     }
 }, {timestamps: true});
 
