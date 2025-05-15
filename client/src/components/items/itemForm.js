@@ -8,10 +8,10 @@ import { plus } from '../../utils/Icons';
 
 
 function ItemsForm() {
-    const {addItem, accounts, error, setError} = useGlobalContext()
+    const { addItem, getItems, getAccounts, getExpenses, accounts, error, setError } = useGlobalContext()
     const [inputState, setInputState] = useState({
         item_name: '',
-        price: '',
+        price: '0',
         due_date: null,
         instalments: '',
         type: '',
@@ -29,13 +29,28 @@ function ItemsForm() {
         setError('');
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault()
         console.log("SUBMITTING ITEM:", inputState); // ✅ Add this
-        addItem(inputState)
+        const itemToSubmit = {
+            item_name: inputState.item_name,
+            price: inputState.price === '' ? 0 : parseFloat(inputState.price),
+            due_date: inputState.due_date,
+            instalments: inputState.instalments === '' ? 0 : parseInt(inputState.instalments, 10),
+            account: inputState.linkedAccount || null,
+            fuelType: inputState.fuelType,
+            litres: inputState.litres === '' ? 0 : parseFloat(inputState.litres),
+            location: inputState.location,
+            carName: inputState.carName,
+            type: inputState.type
+        };
+        await addItem(itemToSubmit)
+        await getItems()
++       await getAccounts()
++       await getExpenses()
         setInputState({
             item_name: '',
-            price: '',
+            price: '0',
             due_date: null,
             instalments: '',
             type: '',

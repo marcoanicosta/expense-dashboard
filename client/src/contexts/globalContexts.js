@@ -59,13 +59,17 @@ export const GlobalProvider = ({ children }) => {
     }
     
     // Expense functions 🛰️
-    const addExpense = async (income) => {
-        const response = await axios.post(`${BASE_URL}add-expense`, income)
-            .catch((err) =>{
-                setError(err.response.data.message)
-            })
-        getExpenses()
-    }
+    const addExpense = async (expenseData) => {
+        try {
+            const response = await axios.post(`${BASE_URL}add-expense`, expenseData, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Expense added successfully:', response.data);
+            getExpenses();
+        } catch (err) {
+            setError(err.response?.data?.message || err.message);
+        }
+    };
     const getExpenses = async () => {
         const response = await axios.get(`${BASE_URL}get-expense`)
         setExpenses(response.data)
