@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import { dollar, calender, comment, trash, money, freelance, stocks, users, bitcoin, card, yt, piggy, book, food, medical, tv, takeaway, clothing, circle } from '../../../utils/Icons';
 import Button from '../../button/Button';
@@ -19,8 +19,11 @@ function ItemsComponentItem({
     accounts,
     handleAssignAccount,
     indicatorColor,
-    type
+    type,
+    expenses
 }) {
+
+    const [showLogs, setShowLogs] = useState(false)
 
     const categoryIcon = () =>{
         switch(category) {
@@ -60,6 +63,8 @@ function ItemsComponentItem({
                 return clothing;
             case 'travelling':
                 return freelance;
+            case 'fuel':
+                return piggy;
             case 'other':
                 return circle;
             default:
@@ -111,6 +116,28 @@ function ItemsComponentItem({
                 </div>
             </div>
   
+            {type === 'fuel' && expenses && expenses.length > 0 && (
+              <div className="fuel-logs">
+                <button onClick={() => setShowLogs(!showLogs)}>
+                  {showLogs
+                    ? 'Hide Fuel Logs'
+                    : `View Fuel Logs (${expenses.length} entries)`}
+                </button>
+                {showLogs && (
+                  <ul>
+                    {expenses.map(exp => {
+                      const { extra = {} } = exp;
+                      const { litres = '–', fuelType = 'N/A', location = 'N/A' } = extra;
+                      return (
+                        <li key={exp._id}>
+                          £{exp.amount} for {litres}L ({fuelType}) @ {location} – {new Date(exp.date).toLocaleDateString()}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            )}
         
         </ItemItemStyled>
     )

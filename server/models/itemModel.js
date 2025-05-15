@@ -14,6 +14,48 @@ const ItemSchema = new mongoose.Schema({
         maxLength: 20,
         trim: true,
         default: 0,
+        min: 0,
+    },
+    category: {
+        type: String,
+        required: false,
+        trim: true,
+        default: ''
+    },
+    description: {
+        type: String,
+        required: false,
+        trim: true,
+        default: '',
+        maxLength: 50
+    },
+    // fuel details at root
+    fuelType: {
+        type: String,
+        enum: ['petrol', 'diesel', 'electric'],
+        default: null,
+        trim: true
+    },
+    litres: {
+        type: Number,
+        default: 0
+    },
+    location: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    carName: {
+        type: String,
+        default: '',
+        trim: true
+    },
+    type: {
+        type: String,
+        enum: ['standard','fuel'],
+        required: true,
+        default: 'standard',
+        trim: true
     },
     due_date: { 
         type: Date,

@@ -5,18 +5,30 @@ const Account = require('../models/accountsModel');
 
 
 exports.addItem = async (req, res) => {
-    const { item_name, price, due_date, instalments, account } = req.body;
+    const { item_name, price, due_date, instalments, account, type, fuelType, litres, location, carName } = req.body;
+
+    // only include fuelType when it's nonempty
+    const safeFuelType   = type === 'fuel' && fuelType   ? fuelType   : undefined;
+    const safeLitres     = type === 'fuel'               ? (parseFloat(litres) || 0) : 0;
+    const safeLocation   = type === 'fuel' && location   ? location   : '';
+    const safeCarName    = type === 'fuel' && carName    ? carName    : '';
 
     let item = new Item({
         item_name,
         price,
         due_date,
         instalments,
-        account
+        account,
+        type,
+        // only include fuelType when defined
+        ...(safeFuelType !== undefined && { fuelType: safeFuelType }),
+        litres:   safeLitres,
+        location: safeLocation,
+        carName:  safeCarName
     });
 
     try {
-        if (!item_name || !price) {
+        if (!item_name || price == null || isNaN(price)) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 

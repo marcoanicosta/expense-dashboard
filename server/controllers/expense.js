@@ -1,28 +1,51 @@
 const Expense = require("../models/expenseModel");
 const Accounts = require("../models/accountsModel");
+const Item = require('../models/itemModel');
 const { getNextOccurrence } = require('../utils/utils');
 
 exports.addExpense = async (req, res) => {
-    const { title, amount, type, date, category, description, accountId, recurrence } = req.body;
+    const { title, amount, type, date, category, description, accountId, recurrence, fuelItemId, litres, location, carName, fuelType } = req.body;
 
-    const expense = new Expense({
-        title,
-        amount,
-        type,
-        date,
-        category,
-        description,
-        account: accountId,
-        recurrence: recurrence ? {
-            frequency: recurrence.frequency,
-            startDate: recurrence.startDate,
-            endDate: recurrence.endDate || null
-        } : undefined
-    });
+    // if fuelItemId provided, derive realAccountId from that item
+    let realAccountId = accountId;
+    if (fuelItemId) {
+      const fuelItem = await Item.findById(fuelItemId);
+      if (!fuelItem) {
+        return res.status(404).json({ message: 'Fuel item not found' });
+      }
+      realAccountId = fuelItem.account;
+    }
+
+    // Build base expense data
+    const expenseData = {
+      title,
+      amount,
+      type,
+      date,
+      category,
+      description,
+      account: realAccountId
+    };
+
+    // Attach recurrence if present
+    if (recurrence) {
+      expenseData.recurrence = {
+        frequency: recurrence.frequency,
+        startDate: recurrence.startDate,
+        endDate: recurrence.endDate || null
+      };
+    }
+
+    // Attach fuel-specific extra fields if this is a fuel expense
+    if (category === 'fuel') {
+      expenseData.extra = { litres, location, carName, fuelType };
+    }
+
+    const expense = new Expense(expenseData);
 
     try {
         // Validations
-        if (!title || !date || !category || !description || !accountId) {
+        if (!title || !date || !category || !description) {
             return res.status(400).json({ message: 'All fields are required' });
         }
         if (amount <= 0 || typeof amount !== "number") {
@@ -30,15 +53,30 @@ exports.addExpense = async (req, res) => {
         }
 
         const savedExpense = await expense.save(); // Save the data to the database
-        const account = await Accounts.findById(accountId);
-        if (!account) {
-            return res.status(404).json({ message: 'Account not found' });
+
+        // — if this expense belongs to a fuel‐item, link it back to that Item
+       if (fuelItemId) {
+            const item = await Item.findById(fuelItemId);
+            if (item) {
+                item.expenses.push(savedExpense._id);
+                await item.save();
+                // recalc completionDate on the item
+                // await item.updateCompletionDate();
+            }
         }
 
-        await account.updateBalanceAfterAddingExpense(savedExpense._id);
+        // Only update an account balance if we have a realAccountId
+        if (realAccountId) {
+            const account = await Accounts.findById(realAccountId);
+            if (!account) {
+                return res.status(404).json({ message: 'Account not found' });
+            }
+            await account.updateBalanceAfterAddingExpense(savedExpense._id);
+        }
 
         res.status(200).json({ message: 'Expense added successfully', expense: savedExpense });
     } catch (error) {
+        console.error('Error adding expense:', error);
         res.status(500).json({ message: 'Server Error', error });
     }
 }

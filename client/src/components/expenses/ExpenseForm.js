@@ -4,48 +4,106 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import { useGlobalContext } from '../../contexts/globalContexts'
 import Button from '../button/Button'
-import { accounts, plus } from '../../utils/Icons';
-
+import { plus } from '../../utils/Icons'; 
 
 function ExpenseForm() {
-    const {addExpense, error, setError, accounts} = useGlobalContext()
+    const { addExpense, error, setError, getAccounts, getItems, getExpenses, accounts: contextAccounts, items } = useGlobalContext()
+ // add an `extra` sub-object in your form state
     const [inputState, setInputState] = useState({
         title: '',
         amount: '',
-        date: '',
+        date: null,
         category: '',
         description: '',
-        accountId:  '',
+        accountId:  '',      // only used for non-fuel
+        fuelItemId: '',      // choose which fuel‐item
+        extra: {             // all fuel fields go here
+            litres: '',
+            location: '',
+            carName: '',
+            fuelType: ''
+        }
     })
 
     const { title, amount, date, category, description, accountId } = inputState;
 
     useEffect(() => {
-        console.log('Accounts in Form 🛜🅿️:', accounts); // Log accounts data in Form
-    }, [accounts]);
+        console.log('Accounts in Form 🛜🅿️:', contextAccounts); // Log accounts data in Form
+    }, [contextAccounts]);
+
+    useEffect(() => {
+        getItems();
+    }, []);
 
     const handleInput = name => e => {
         const value = e.target.value;
-        setInputState(prevState => ({
-            ...prevState,
-            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
-        }));
-        console.log('Updated Input State:', {
-            ...inputState,
-            [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
-        });
+        if (['litres','location','carName','fuelType'].includes(name)) {
+            setInputState(prevState => ({
+                ...prevState,
+                extra: {
+                    ...prevState.extra,
+                    [name]: value
+                }
+            }));
+            console.log('Updated Input State:', {
+                ...inputState,
+                extra: {
+                    ...inputState.extra,
+                    [name]: value
+                }
+            });
+        } else {
+            setInputState(prevState => ({
+                ...prevState,
+                [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+            }));
+            console.log('Updated Input State:', {
+                ...inputState,
+                [name]: name === 'amount' ? (parseInt(value, 10) || 0) : value
+            });
+        }
     };
 
-    const handleSubmit = e => {
+ const handleSubmit = async e => {
         e.preventDefault()
-        addExpense(inputState)
+                // build a payload that matches your server‐side API
+        const payload = {
+          title:       inputState.title,
+          amount:      parseFloat(inputState.amount) || 0,
+          date:        inputState.date,
+          category:    inputState.category,
+          description: inputState.description,
+
+          // for fuel, derive account from the fuel‐item itself
+          accountId:
+            inputState.category === 'fuel' && inputState.fuelItemId
+              ? (items.find(i => i._id === inputState.fuelItemId) || {}).account
+              : inputState.accountId,
+
+          // wrap all fuel‐specific fields into the `extra` object
+          extra: inputState.category === 'fuel'
+            ? { ...inputState.extra }
+            : undefined,
+          fuelItemId: inputState.fuelItemId
+        }
+        await addExpense(payload)
+        await getExpenses()
+        await getAccounts()
+        await getItems()     
         setInputState({
             title: '',
             amount: '',
-            date: '',
+            date: null,
             category: '',
             description: '',
             accountId: '',
+            fuelItemId: '',
+            extra: {
+                litres: '',
+                location: '',
+                carName: '',
+                fuelType: ''
+            }
         })
     }
 
@@ -55,14 +113,14 @@ function ExpenseForm() {
             <div className="input-control">
                 <input 
                     type="text" 
-                    value={title}
+                    value={title || ''}
                     name={'title'} 
                     placeholder="Expense Title"
                     onChange={handleInput('title')}
                 />
             </div>
             <div className="input-control">
-                <input value={amount}  
+                <input value={amount || ''}  
                     type="text" 
                     name={'amount'} 
                     placeholder={'Expense Amount'}
@@ -81,7 +139,7 @@ function ExpenseForm() {
                 />
             </div>
             <div className="selects input-control">
-                <select required value={category} name="category" id="category" onChange={handleInput('category')}>
+                <select required value={category || ''} name="category" id="category" onChange={handleInput('category')}>
                     <option value="" disabled >Select Option</option>
                     <option value="education">Education</option>
                     <option value="groceries">Groceries</option>
@@ -91,20 +149,66 @@ function ExpenseForm() {
                     <option value="clothing">Clothing</option>  
                     <option value="travelling">Travelling</option>  
                     <option value="other">Other</option>  
+                    <option value="fuel">Fuel</option>
                 </select>
             </div>
             <div className="input-control">
-                <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
+                <textarea name="description" value={description || ''} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
             </div>
-            <div className="selects input-control">
-                <select required value={accountId} name="accountId" id="accountId" onChange={handleInput('accountId')}>
-                    <option value="" disabled>Select Account</option>
-                    {accounts.map(account => (
-                        <option key={account._id} value={account._id}>{account.account_name}</option>
-                        
-                    ))}
+            {/* only show account selector for non-fuel */}
+            {inputState.category !== 'fuel' && (
+              <div className="selects input-control">
+                <select
+                  required
+                  value={inputState.accountId || ''}
+                  onChange={handleInput('accountId')}
+                >
+                  <option value="" disabled>Select Account</option>
+                  {contextAccounts.map(acc => (
+                    <option key={acc._id} value={acc._id}>
+                      {acc.account_name}
+                    </option>
+                  ))}
                 </select>
-            </div>
+              </div>
+            )}
+            {inputState.category === 'fuel' && (
+                <>
+                    <div className="input-control">
+                        <input 
+                            type="number"
+                            value={inputState.extra.litres || ''}
+                            name="litres"
+                            placeholder="Litres"
+                            onChange={handleInput('litres')}
+                        />
+                    </div>
+                    <div className="input-control">
+                        <input 
+                            type="text"
+                            value={inputState.extra.location || ''}
+                            name="location"
+                            placeholder="Fuel Location"
+                            onChange={handleInput('location')}
+                        />
+                    </div>
+                    <div className="selects input-control">
+                      <select
+                        value={inputState.fuelItemId || ''}
+                        onChange={handleInput('fuelItemId')}
+                      >
+                        <option value="">Assign to Fuel Item (optional)</option>
+                        {items
+                          .filter(i => i.type === 'fuel')
+                          .map(i => (
+                            <option key={i._id} value={i._id}>
+                              {i.item_name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                </>
+            )}
             <div className="submit-btn">
                 <Button 
                     name={'Add Expense'}

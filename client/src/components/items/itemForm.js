@@ -8,13 +8,18 @@ import { plus } from '../../utils/Icons';
 
 
 function ItemsForm() {
-    const {addItem, accounts, error, setError} = useGlobalContext()
+    const { addItem, getItems, getAccounts, getExpenses, accounts, error, setError } = useGlobalContext()
     const [inputState, setInputState] = useState({
         item_name: '',
-        price: '',
+        price: '0',
         due_date: null,
         instalments: '',
         type: '',
+        linkedAccount: '',
+        fuelType: '',
+        litres: '',
+        location: '',
+        carName: '',
     });
 
     const { item_name, price, date, type,description } = inputState;
@@ -24,17 +29,36 @@ function ItemsForm() {
         setError('');
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault()
         console.log("SUBMITTING ITEM:", inputState); // ✅ Add this
-        addItem(inputState)
+        const itemToSubmit = {
+            item_name: inputState.item_name,
+            price: inputState.price === '' ? 0 : parseFloat(inputState.price),
+            due_date: inputState.due_date,
+            instalments: inputState.instalments === '' ? 0 : parseInt(inputState.instalments, 10),
+            account: inputState.linkedAccount || null,
+            fuelType: inputState.fuelType,
+            litres: inputState.litres === '' ? 0 : parseFloat(inputState.litres),
+            location: inputState.location,
+            carName: inputState.carName,
+            type: inputState.type
+        };
+        await addItem(itemToSubmit)
+        await getItems()
++       await getAccounts()
++       await getExpenses()
         setInputState({
             item_name: '',
-            price: '',
-            account: inputState.linkedAccount,
+            price: '0',
             due_date: null,
             instalments: '',
             type: '',
+            linkedAccount: '',
+            fuelType: '',
+            litres: '',
+            location: '',
+            carName: '',
         });
     }
 
@@ -51,13 +75,16 @@ function ItemsForm() {
                 />
             </div>
             <div className="input-control">
-                <input value={price}  
+                <input 
+                    value={price}  
                     type="text" 
                     name={'price'} 
                     placeholder={'Items Price'}
-                    onChange={handleInput('price')} 
+                    onChange={handleInput('price')}
+                    disabled={inputState.type === 'fuel'}
                 />
             </div>
+            
             {/* <div className="input-control">
                 <DatePicker 
                     id='date'
@@ -72,10 +99,8 @@ function ItemsForm() {
             <div className="selects input-control">
                 <select required value={type} name="type" id="type" onChange={handleInput('type')}>
                     <option value="" disabled >Select Option</option>
-                    <option value="normal">normal</option>
-                    <option value="cash">Cash</option>
-                    <option value="savings">Savings</option>
-                    <option value="credit">Credit</option>
+                    <option value="standard">Standard</option>
+                    <option value="fuel">Fuel</option>
                 </select>
             </div>
             {inputState.type && (
@@ -113,6 +138,45 @@ function ItemsForm() {
                     onChange={handleInput('instalments')}
                 />
             </div>
+            {inputState.type === 'fuel' && (
+            <>
+                <div className="input-control">
+                <select value={inputState.fuelType} onChange={handleInput('fuelType')}>
+                    <option value="">Select Fuel Type</option>
+                    <option value="petrol">Petrol</option>
+                    <option value="diesel">Diesel</option>
+                    <option value="electric">Electric</option>
+                </select>
+                </div>
+                <div className="input-control">
+                <input 
+                    type="number"
+                    value={inputState.litres}
+                    name="litres"
+                    placeholder="Litres"
+                    onChange={handleInput('litres')}
+                />
+                </div>
+                <div className="input-control">
+                <input 
+                    type="text"
+                    value={inputState.location}
+                    name="location"
+                    placeholder="Fuel Location"
+                    onChange={handleInput('location')}
+                />
+                </div>
+                <div className="input-control">
+                <input 
+                    type="text"
+                    value={inputState.carName}
+                    name="carName"
+                    placeholder="Car Name"
+                    onChange={handleInput('carName')}
+                />
+                </div>
+            </>
+            )}
             {/* <div className="input-control">
                 <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
             </div> */}

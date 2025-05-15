@@ -10,9 +10,7 @@ const ExpenseSchema = new mongoose.Schema({
     },
     amount: {
         type: Number,
-        required: true,
-        maxLength: 20,
-        trim: true
+        required: true
     },
     type: {
         type: String,
@@ -21,8 +19,7 @@ const ExpenseSchema = new mongoose.Schema({
     date: {
         type: Date,
         required: true,
-        default: Date.now,
-        trim: true
+        default: Date.now
     },
     category: {
         type: String,
@@ -33,8 +30,8 @@ const ExpenseSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
-        maxLength:  20,
-        default: '—', maxLength: 20,
+        default: '—',
+        maxLength: 20,
         trim: true
     },
     account: {
@@ -54,6 +51,27 @@ const ExpenseSchema = new mongoose.Schema({
         },
         endDate: {
             type: Date,
+            required: false
+        }
+    },
+    extra: {
+        litres: {
+            type: Number,
+            required: false
+        },
+        location: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        carName: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        fuelType: {
+            type: String,
+            enum: ['petrol', 'diesel', 'electric'],
             required: false
         }
     }
